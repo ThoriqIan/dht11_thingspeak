@@ -1,5 +1,4 @@
 #include <ESP8266WiFi.h>
-#include <ESP8266HTTPClient.h>
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 #include "DHT.h"
