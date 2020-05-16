@@ -30,163 +30,165 @@ Cara mengkoneksikan dht11 ke thingspeak secara berkala
 
 ![thingspeak](https://user-images.githubusercontent.com/65123734/82112046-b4e28a00-9773-11ea-9f8d-4b4d0f54cb2b.PNG)
 
-> Tips
+**Penjelasan Code**
 
-- HAVE WHITE SPACE
-- MAKE IT PRETTY
-- GIFS ARE REALLY COOL
+- Library yang dipakai
 
-> GIF Tools
+> Library WiFi
+'''
+#include <ESP8266WiFi.h>
+'''
 
-- Use <a href="http://recordit.co/" target="_blank">**Recordit**</a> to create quicks screencasts of your desktop and export them as `GIF`s.
-- For terminal sessions, there's <a href="https://github.com/chjj/ttystudio" target="_blank">**ttystudio**</a> which also supports exporting `GIF`s.
+> Library NTP
+'''
+#include <NTPClient.h>
+#include <WiFiUdp.h>
+'''
 
-**Recordit**
+> Library DHT
+'''
+#include "DHT.h"
+'''
 
-![Recordit GIF](http://g.recordit.co/iLN6A0vSD8.gif)
+> Library Thingspeak
+'''
+#include "ThingSpeak.h"
+'''
 
-**ttystudio**
+> Mendefinisikan pin dan jenis DHT
+'''
+#define DHTPIN D1
+#define DHTTYPE DHT11
+'''
 
-![ttystudio GIF](https://raw.githubusercontent.com/chjj/ttystudio/master/img/example.gif)
+> ID channel yang digunakan
+'''
+#define SECRET_CH_ID 806400
+'''
+![web](https://user-images.githubusercontent.com/65123734/82112328-0f7ce580-9776-11ea-8b34-4a7d98fc659d.png)
 
----
+> Mendefinisikan objek dht
+'''
+DHT dht(DHTPIN, DHTTYPE);
+'''
 
-## Table of Contents (Optional)
+> Mengkoneksikan dengan jaringan
+'''
+const char* ssid = "BEDABISA";  
+const char* pass = "I23A5678g";
+'''
 
-> If your `README` has a lot of info, section headers might be nice.
+> Mendifinikan waktu dalam GMT
+'''
+const long utcOffsetInSeconds = 3600*7;
+''
 
-- [Installation](#installation)
-- [Features](#features)
-- [Contributing](#contributing)
-- [Team](#team)
-- [FAQ](#faq)
-- [Support](#support)
-- [License](#license)
+> Mendefinisikan NTP
+'''
+// Define NTP Client to get time
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds);
+'''
+
+> Mendifinisikan WiFi client
+'''
+WiFiClient  client;
+'''
+
+> Mendefinisikan Channel dan API key
+'''
+unsigned long myChannelNumber = SECRET_CH_ID;
+const char * myWriteAPIKey = "605YLGWBOGDDL7IT";
+'''
+
+![api](https://user-images.githubusercontent.com/65123734/82112393-a8136580-9776-11ea-8592-9ea71e339624.PNG)
+
+> Mendefinisikan variabel temperatur dan kelembapan dengan tipe data float
+'''
+float h;
+float t;
+'''
 
 
----
+void setup() {
+  // put your setup code here, to run once:
+> Mendefinisikan Serial Monitor dengan Baud Rate 9600
+  '''
+  Serial.begin(9600);
+  '''
+  
+> Mendefinisikan WiFi mode
+  '''
+  WiFi.mode(WIFI_STA); 
+  '''
+  
+> Mendefinisikan jaringan yang dipakai ke thingspeak
+  '''
+  ThingSpeak.begin(client);
+  '''
+  
+> Mengkoneksikan mikrokontroller ke WiFi
+  '''
+  WiFi.begin(ssid, pass);  
+  '''
 
-## Example (Optional)
+> Menjalankan DHT
+  '''
+  dht.begin();
+}
+  '''
 
-```javascript
-// code away!
+int ngirimmenit = 0;
 
-let generateProject = project => {
-  let code = [];
-  for (let js = 0; js < project.length; js++) {
-    code.push(js);
+void loop() {
+  sensorSuhu();
+  
+  if (WiFi.status() == WL_CONNECTED) {
+    timeClient.begin();
+    timeClient.update();
+    int menit = timeClient.getMinutes();
+    
+    if(ngirimmenit==0){
+      if(menit%5==0){
+        thingspeak();
+        ngirimmenit=1;
+      }
+    }
+    if(ngirimmenit==1){
+      if(menit%5!=0){
+        ngirimmenit=0;
+      }
+    }
   }
-};
-```
+}
 
----
+void thingspeak(){
+  Serial.print(F("Humidity: "));
+  Serial.print(h);
+  Serial.print(F("%  Temperature: "));
+  Serial.print(t);
+  Serial.print(F("°C "));
+  
+  ThingSpeak.setField(1, t);
+  ThingSpeak.setField(2, h);
 
-## Installation
+  int x = ThingSpeak.writeFields(myChannelNumber, myWriteAPIKey);
+  if(x == 200){
+    Serial.println("Channel update successful.");
+  }
+  else{
+    Serial.println("Problem updating channel. HTTP error code " + String(x));
+  }
+}
+  
+void sensorSuhu() {
+  delay(2000);
 
-- All the `code` required to get started
-- Images of what it should look like
+  h = dht.readHumidity();
+  t = dht.readTemperature();
 
-### Clone
-
-- Clone this repo to your local machine using `https://github.com/fvcproductions/SOMEREPO`
-
-### Setup
-
-- If you want more syntax highlighting, format your code like this:
-
-> update and install this package first
-
-```shell
-$ brew update
-$ brew install fvcproductions
-```
-
-> now install npm and bower packages
-
-```shell
-$ npm install
-$ bower install
-```
-
-- For all the possible languages that support syntax highlithing on GitHub (which is basically all of them), refer <a href="https://github.com/github/linguist/blob/master/lib/linguist/languages.yml" target="_blank">here</a>.
-
----
-
-## Features
-## Usage (Optional)
-## Documentation (Optional)
-## Tests (Optional)
-
-- Going into more detail on code and technologies used
-- I utilized this nifty <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet" target="_blank">Markdown Cheatsheet</a> for this sample `README`.
-
----
-
-## Contributing
-
-> To get started...
-
-### Step 1
-
-- **Option 1**
-    - 🍴 Fork this repo!
-
-- **Option 2**
-    - 👯 Clone this repo to your local machine using `https://github.com/joanaz/HireDot2.git`
-
-### Step 2
-
-- **HACK AWAY!** 🔨🔨🔨
-
-### Step 3
-
-- 🔃 Create a new pull request using <a href="https://github.com/joanaz/HireDot2/compare/" target="_blank">`https://github.com/joanaz/HireDot2/compare/`</a>.
-
----
-
-## Team
-
-> Or Contributors/People
-
-| <a href="http://fvcproductions.com" target="_blank">**FVCproductions**</a> | <a href="http://fvcproductions.com" target="_blank">**FVCproductions**</a> | <a href="http://fvcproductions.com" target="_blank">**FVCproductions**</a> |
-| :---: |:---:| :---:|
-| [![FVCproductions](https://avatars1.githubusercontent.com/u/4284691?v=3&s=200)](http://fvcproductions.com)    | [![FVCproductions](https://avatars1.githubusercontent.com/u/4284691?v=3&s=200)](http://fvcproductions.com) | [![FVCproductions](https://avatars1.githubusercontent.com/u/4284691?v=3&s=200)](http://fvcproductions.com)  |
-| <a href="http://github.com/fvcproductions" target="_blank">`github.com/fvcproductions`</a> | <a href="http://github.com/fvcproductions" target="_blank">`github.com/fvcproductions`</a> | <a href="http://github.com/fvcproductions" target="_blank">`github.com/fvcproductions`</a> |
-
-- You can just grab their GitHub profile image URL
-- You should probably resize their picture using `?s=200` at the end of the image URL.
-
----
-
-## FAQ
-
-- **How do I do *specifically* so and so?**
-    - No problem! Just do this.
-
----
-
-## Support
-
-Reach out to me at one of the following places!
-
-- Website at <a href="http://fvcproductions.com" target="_blank">`fvcproductions.com`</a>
-- Twitter at <a href="http://twitter.com/fvcproductions" target="_blank">`@fvcproductions`</a>
-- Insert more social links here.
-
----
-
-## Donations (Optional)
-
-- You could include a <a href="https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0/dist/gratipay.png" target="_blank">Gratipay</a> link as well.
-
-[![Support via Gratipay](https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0/dist/gratipay.png)](https://gratipay.com/fvcproductions/)
-
-
----
-
-## License
-
-[![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://badges.mit-license.org)
-
-- **[MIT license](http://opensource.org/licenses/mit-license.php)**
-- Copyright 2015 © <a href="http://fvcproductions.com" target="_blank">FVCproductions</a>.
+  if (isnan(h) || isnan(t)) {
+    Serial.println(F("Failed to read from DHT sensor!"));
+    return;
+  }
+}
