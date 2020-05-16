@@ -35,122 +35,144 @@ Cara mengkoneksikan dht11 ke thingspeak secara berkala
 - Library yang dipakai
 
 > Library WiFi
-'''
+```
 #include <ESP8266WiFi.h>
-'''
+```
 
 > Library NTP
-'''
+```
 #include <NTPClient.h>
 #include <WiFiUdp.h>
-'''
+```
 
 > Library DHT
-'''
+```
 #include "DHT.h"
-'''
+```
 
 > Library Thingspeak
-'''
+```
 #include "ThingSpeak.h"
-'''
+```
 
 > Mendefinisikan pin dan jenis DHT
-'''
+```
 #define DHTPIN D1
 #define DHTTYPE DHT11
-'''
+```
 
 > ID channel yang digunakan
-'''
+```
 #define SECRET_CH_ID 806400
-'''
+```
 ![web](https://user-images.githubusercontent.com/65123734/82112328-0f7ce580-9776-11ea-8b34-4a7d98fc659d.png)
 
 > Mendefinisikan objek dht
-'''
+```
 DHT dht(DHTPIN, DHTTYPE);
-'''
+```
 
 > Mengkoneksikan dengan jaringan
-'''
+```
 const char* ssid = "BEDABISA";  
 const char* pass = "I23A5678g";
-'''
+```
 
 > Mendifinikan waktu dalam GMT
-'''
+```
 const long utcOffsetInSeconds = 3600*7;
-''
+```
 
 > Mendefinisikan NTP
-'''
+```
 // Define NTP Client to get time
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds);
-'''
+```
 
 > Mendifinisikan WiFi client
-'''
+```
 WiFiClient  client;
-'''
+```
 
 > Mendefinisikan Channel dan API key
-'''
+```
 unsigned long myChannelNumber = SECRET_CH_ID;
 const char * myWriteAPIKey = "605YLGWBOGDDL7IT";
-'''
+```
 
 ![api](https://user-images.githubusercontent.com/65123734/82112393-a8136580-9776-11ea-8592-9ea71e339624.PNG)
 
 > Mendefinisikan variabel temperatur dan kelembapan dengan tipe data float
-'''
+```
 float h;
 float t;
-'''
+```
 
 
 void setup() {
   // put your setup code here, to run once:
 > Mendefinisikan Serial Monitor dengan Baud Rate 9600
-  '''
+  ```
   Serial.begin(9600);
-  '''
+  ```
   
 > Mendefinisikan WiFi mode
-  '''
+  ```
   WiFi.mode(WIFI_STA); 
-  '''
+  ```
   
 > Mendefinisikan jaringan yang dipakai ke thingspeak
-  '''
+  ```
   ThingSpeak.begin(client);
-  '''
+  ```
   
 > Mengkoneksikan mikrokontroller ke WiFi
-  '''
+  ```
   WiFi.begin(ssid, pass);  
-  '''
+  ```
 
 > Menjalankan DHT
-  '''
+  ```
   dht.begin();
+  ```
 }
-  '''
 
+> Membuat variabel agar hanya mengirim 1 kali saja dalam menit yang ditentukan
+```
 int ngirimmenit = 0;
+```
 
 void loop() {
+> Memanggil Prosedur sensor Suhu
+  ```
   sensorSuhu();
-  
+  ```
+
+> Cek apakah WiFi sudah terkoneksi.
+  ```  
   if (WiFi.status() == WL_CONNECTED) {
+  ```
+
+> Mendapatkan menit dari NTP
+    ```
     timeClient.begin();
     timeClient.update();
     int menit = timeClient.getMinutes();
+    ```
     
+> Logika mengirim 5 menit sekali
+    ```
     if(ngirimmenit==0){
       if(menit%5==0){
+    ```
+> Memanggil Prosedut thingspeak
+        ```
         thingspeak();
+        ```
+
+> Proses agar tetap mengirim data ke thingspeak 5 menit sekali
+    ```
         ngirimmenit=1;
       }
     }
@@ -159,6 +181,7 @@ void loop() {
         ngirimmenit=0;
       }
     }
+    ```
   }
 }
 
