@@ -8,10 +8,24 @@ Cara mengkoneksikan dht11 ke thingspeak secara berkala
 
 **Cara Download Library**
 
-[![INSERT YOUR GRAPHIC HERE](http://i.imgur.com/dt8AUb6.png)]()
+> Buka aplikasi arduino.
+> Klik menu sketch
+> Include library
+> Manage Library
 
-- Most people will glance at your `README`, *maybe* star it, and leave
-- Ergo, people should understand instantly what your project is about based on your repo
+*insert gambar*
+
+- Library DHT
+
+> Cari dengan keyword DHT
+> Install library DHT by Adafruit
+
+- Library Thingspeak
+
+> Cari dengan keyword Thingspeak
+> Install library DHT by MathWork
+
+*insert gambar*
 
 > Tips
 
