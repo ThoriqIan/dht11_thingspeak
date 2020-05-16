@@ -6,7 +6,7 @@ Cara mengkoneksikan dht11 ke thingspeak secara berkala
 - Library Thingspeak by MathWork
 - Library NTP
 
-***INSERT ANOTHER GRAPHIC HERE***
+**Cara Download Library**
 
 [![INSERT YOUR GRAPHIC HERE](http://i.imgur.com/dt8AUb6.png)]()
 
