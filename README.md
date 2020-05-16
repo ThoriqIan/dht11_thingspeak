@@ -109,6 +109,7 @@ float h;
 float t;
 ```
 
+**Void Setup**
 
 void setup() {
   // put your setup code here, to run once:
@@ -143,36 +144,38 @@ void setup() {
 int ngirimmenit = 0;
 ```
 
+**Void Loop**
+
 void loop() {
 > Memanggil Prosedur sensor Suhu
   ```
   sensorSuhu();
   ```
 
-> Cek apakah WiFi sudah terkoneksi.
+> Pengecekan apakah WiFi sudah terkoneksi.
   ```  
   if (WiFi.status() == WL_CONNECTED) {
   ```
 
 > Mendapatkan menit dari NTP
-    ```
+  ```
     timeClient.begin();
     timeClient.update();
     int menit = timeClient.getMinutes();
-    ```
+  ```
     
 > Logika mengirim 5 menit sekali
-    ```
+  ```
     if(ngirimmenit==0){
       if(menit%5==0){
-    ```
+  ```
 > Memanggil Prosedut thingspeak
-        ```
+  ```
         thingspeak();
-        ```
+  ```
 
 > Proses agar tetap mengirim data ke thingspeak 5 menit sekali
-    ```
+  ```
         ngirimmenit=1;
       }
     }
@@ -181,20 +184,31 @@ void loop() {
         ngirimmenit=0;
       }
     }
-    ```
+  ```
   }
 }
 
+**Prosedur thingspeak**
+
 void thingspeak(){
+> Memunculkan temperatur dan kelembapan ke Serial Monitor
+```
   Serial.print(F("Humidity: "));
   Serial.print(h);
   Serial.print(F("%  Temperature: "));
   Serial.print(t);
   Serial.print(F("°C "));
-  
+```
+
+> Mengirim data ke field thingspeak
+Pastikan Field 1 didefinisikan sebagai temperatur dan Field 2 didefinisikan sebagai kelembapan
+```
   ThingSpeak.setField(1, t);
   ThingSpeak.setField(2, h);
+```
 
+> Pengecekan apakah data berhasil terkirim atau tidak
+```
   int x = ThingSpeak.writeFields(myChannelNumber, myWriteAPIKey);
   if(x == 200){
     Serial.println("Channel update successful.");
@@ -202,16 +216,29 @@ void thingspeak(){
   else{
     Serial.println("Problem updating channel. HTTP error code " + String(x));
   }
+```
 }
+
+**Prosedur sensorSuhu**
   
 void sensorSuhu() {
-  delay(2000);
 
+> Memberi delay 2000ms
+```
+  delay(2000);
+```
+
+> Menyimpan data DHT ke variabel
+```
   h = dht.readHumidity();
   t = dht.readTemperature();
+```
 
+> Pengecekan apakah DHT sudah terhubung atau tidak
+```
   if (isnan(h) || isnan(t)) {
     Serial.println(F("Failed to read from DHT sensor!"));
     return;
   }
+```
 }
