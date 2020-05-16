@@ -13,19 +13,22 @@ Cara mengkoneksikan dht11 ke thingspeak secara berkala
 > Include library
 > Manage Library
 
-*insert gambar*
+![lib](https://user-images.githubusercontent.com/65123734/82112041-b01dd600-9773-11ea-8f4d-4326dd360534.png)
 
 - Library DHT
 
 > Cari dengan keyword DHT
 > Install library DHT by Adafruit
 
+![dht](https://user-images.githubusercontent.com/65123734/82112037-abf1b880-9773-11ea-95ee-83c5f7ef39df.PNG)
+
 - Library Thingspeak
 
 > Cari dengan keyword Thingspeak
 > Install library DHT by MathWork
 
-*insert gambar*
+
+![thingspeak](https://user-images.githubusercontent.com/65123734/82112046-b4e28a00-9773-11ea-9f8d-4b4d0f54cb2b.PNG)
 
 > Tips
 
