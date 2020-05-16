@@ -11,8 +11,8 @@
 
 DHT dht(DHTPIN, DHTTYPE);
 
-const char* ssid = "Alfatih";  
-const char* pass = "16042016";
+const char* ssid = "BEDABISA";  
+const char* pass = "I23A5678g";
 
 const long utcOffsetInSeconds = 3600*7;
 
